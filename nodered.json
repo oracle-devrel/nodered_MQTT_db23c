@@ -1,0 +1,175 @@
+[
+    {
+        "id": "aeb2581133816f6a",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2888e7188a7ad50c",
+        "type": "inject",
+        "z": "aeb2581133816f6a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 240,
+        "y": 260,
+        "wires": [
+            [
+                "e87a423e3703950f",
+                "4c09bbf679e56e88"
+            ]
+        ]
+    },
+    {
+        "id": "e87a423e3703950f",
+        "type": "debug",
+        "z": "aeb2581133816f6a",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "d1ffcf6557b7c968",
+        "type": "mqtt in",
+        "z": "aeb2581133816f6a",
+        "name": "",
+        "topic": "sensor/wio-terminal",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "99051ccc8a1e88f8",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 250,
+        "y": 720,
+        "wires": [
+            [
+                "c6b181c31aea7693",
+                "e753531d454755fb"
+            ]
+        ]
+    },
+    {
+        "id": "4c09bbf679e56e88",
+        "type": "oracledb",
+        "z": "aeb2581133816f6a",
+        "name": "",
+        "usequery": true,
+        "query": "select * from C##nodered.nodered",
+        "usemappings": false,
+        "mappings": "",
+        "server": "2c4f5b43d74b4430",
+        "resultaction": "multi",
+        "resultlimit": 100,
+        "x": 440,
+        "y": 200,
+        "wires": [
+            [
+                "e87a423e3703950f"
+            ]
+        ]
+    },
+    {
+        "id": "c6b181c31aea7693",
+        "type": "oracledb",
+        "z": "aeb2581133816f6a",
+        "name": "",
+        "usequery": true,
+        "query": "INSERT INTO C##nodered.sensor_data\n\t(vibration, sound, temp, humi)\n\tVALUES (\n\t\t:valueOfValuesArrayIndex0,\n\t\t:valueOfValuesArrayIndex1,\n\t\t:valueOfValuesArrayIndex2,\n\t\t:valueOfValuesArrayIndex3\n\t)\n\n",
+        "usemappings": false,
+        "mappings": "[\n\t\"msg.payload.vibration\",\n\t\"msg.payload.sound\",\n\t\"msg.payload.temp\",\n\t\"msg.payload.humi\"\n]",
+        "server": "2c4f5b43d74b4430",
+        "resultaction": "multi",
+        "resultlimit": 100,
+        "x": 480,
+        "y": 600,
+        "wires": [
+            [
+                "e753531d454755fb"
+            ]
+        ]
+    },
+    {
+        "id": "e753531d454755fb",
+        "type": "debug",
+        "z": "aeb2581133816f6a",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "99051ccc8a1e88f8",
+        "type": "mqtt-broker",
+        "name": "130.162.49.247",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "2c4f5b43d74b4430",
+        "type": "oracle-server",
+        "connectionname": "free",
+        "tnsname": "free",
+        "connectiontype": "TNS Name",
+        "instantclientpath": "/opt/oracle/product/23c/dbhomeFree/instantclient",
+        "host": "",
+        "port": "",
+        "reconnect": true,
+        "reconnecttimeout": "5000",
+        "db": ""
+    }
+]

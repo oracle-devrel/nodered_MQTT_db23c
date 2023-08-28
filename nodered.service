@@ -1,0 +1,14 @@
+[Unit]
+Description=nodred
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/node-red
+WorkingDirectory=/home/opc
+User=opc
+Group=opc
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

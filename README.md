@@ -1,32 +1,82 @@
-# nodered_MQTT_db23c
+# Oracle Database 23C Free installation guide
 
-[![License: UPL](https://img.shields.io/badge/license-UPL-green)](https://img.shields.io/badge/license-UPL-green) [![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=oracle-devrel_nodered_MQTT_db23c)](https://sonarcloud.io/dashboard?id=oracle-devrel_nodered_MQTT_db23c)
+Terraform script that helps you provision Nodered and Mosquitto server on OCI integrated into a Oracle Database 23c free edition
 
-## THIS IS A NEW, BLANK REPO THAT IS NOT READY FOR USE YET.  PLEASE CHECK BACK SOON!
+**NodeRed** 
 
-## Introduction
-MISSING
+Node-RED is an open-source, flow-based programming tool that enables users to create IoT applications and workflows visually. It is built on top of Node.js and provides a web-based flow editor that makes it easy to connect devices, APIs, and services. Node-RED comes with a rich set of pre-built nodes that make it easy to connect to different devices and services, including MQTT, HTTP, and WebSocket.
 
-## Getting Started
-MISSING
+Oracle 23c free edition is a freely available oracle database that you can use for free readmore [here](https://www.oracle.com/database/free/)
 
-### Prerequisites
-MISSING
 
-## Notes/Issues
-MISSING
+## Logical Diagram 
+![Logical Diagram](img/logical.png)
 
-## URLs
-* Nothing at this time
+## Architecture Diagram 
+![Architecture Diagram](img/deployment.png)
+_*Note this is the optimum deployment diagram, however in this repo I'm provisioning everything on a single machine_
 
-## Contributing
-This project is open source.  Please submit your contributions by forking this repository and submitting a pull request!  Oracle appreciates any contributions that are made by the open source community.
+## Configuration
 
-## License
-Copyright (c) 2022 Oracle and/or its affiliates.
+1. Log into cloud console 
+2. Run the following 
+```
+git clone https://github.com/badr42/Oracle_db23cfree
+cd Oracle_db23cfree
+export TF_VAR_compartment_ocid='<comparment-ocid>'
+#export TF_VAR_region='<home-region>'
+export TF_VAR_DB_PASS=<password>
 
-Licensed under the Universal Permissive License (UPL), Version 1.0.
 
-See [LICENSE](LICENSE) for more details.
+<optional>
+# Select Availability Domain, zero based, if not set it defaults to 0
+export TF_VAR_AD_number='0'
+```
 
-ORACLE AND ITS AFFILIATES DO NOT PROVIDE ANY WARRANTY WHATSOEVER, EXPRESS OR IMPLIED, FOR ANY SOFTWARE, MATERIAL OR CONTENT OF ANY KIND CONTAINED OR PRODUCED WITHIN THIS REPOSITORY, AND IN PARTICULAR SPECIFICALLY DISCLAIM ANY AND ALL IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.  FURTHERMORE, ORACLE AND ITS AFFILIATES DO NOT REPRESENT THAT ANY CUSTOMARY SECURITY REVIEW HAS BEEN PERFORMED WITH RESPECT TO ANY SOFTWARE, MATERIAL OR CONTENT CONTAINED OR PRODUCED WITHIN THIS REPOSITORY. IN ADDITION, AND WITHOUT LIMITING THE FOREGOING, THIRD PARTIES MAY HAVE POSTED SOFTWARE, MATERIAL OR CONTENT TO THIS REPOSITORY WITHOUT ANY REVIEW. USE AT YOUR OWN RISK. 
+3. Execute the script generate-keys.sh to generate private key to access the instance
+```
+ssh-keygen -t rsa -b 2048 -N "" -f server.key
+```
+
+
+## Build
+To build simply execute the next commands. 
+
+```
+terraform init
+terraform plan
+terraform apply
+```
+
+## Post Config settings
+1. Log into node-red by directing your browser to instance-public-ip:1880
+2. Update the oracle db node server and add in the user name and password of the nodered user created during the provisioning process 
+
+
+
+## Connect to the DB
+```
+ssh -i server.key opc@instance-public-ip
+
+#Switch to user Oracle  
+sudo su - oracle 
+
+**set the environment variables**
+export ORACLE_SID=FREE 
+export ORAENV_ASK=NO 
+. /opt/oracle/product/23c/dbhomeFree/bin/oraenv
+cd $ORACLE_HOME/bin
+  
+lsnrctl status
+./sqlplus / as sysdba
+```
+
+
+## IMPORTANT 
+
+1. Please reset the passwords 
+2. I built it to be wide open you'll need to add security and ssl certificates for both node-red as well the mosquitto servers
+
+
+## Trouble Shooting
+1. If the script fails, try to SSH to the machine and run database.sh then install.sh 
